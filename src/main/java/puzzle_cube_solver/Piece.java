@@ -3,10 +3,7 @@ class Piece {
     public byte east;
     public byte south;
     public byte west;
-    public int size;
-
-    public Piece(int size, byte north, byte east, byte south, byte west) {
-        this.size = size;
+    public Piece(byte north, byte east, byte south, byte west) {
         this.north = north;
         this.east = east;
         this.south = south;

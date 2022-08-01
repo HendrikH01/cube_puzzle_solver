@@ -50,23 +50,37 @@ public class Main {
         return nstr;
     }
     public static void generatePiece() {
-        byte[] edges = {4,5,6,10,11,12,20,21,24,26,27};
-        byte[] left_set = {20,21,24,26,27};
-        byte[] both_set = {5,11,}
+        //             only right               both            nothing         only left
+        byte[] edges = {0b00101,0b01011,0b00111,0b10101,0b11011,0b00100,0b01010,0b10100,0b11010,0b11100};
+        //             both            only left
+        byte[] left = {0b10101,0b11011,0b10100,0b11010,0b11100};
+        byte[] left_conn = {0b11011,0b11010,0b11100};
+        //                 only right              nothing
+        byte[] not_left = {0b00101,0b01011,0b00111,0b00100,0b01010,};
         Random rand = new Random();
-        byte size = (byte)(rand.nextInt(2) + 3);
-        byte north = edges[(byte)rand.nextInt(10)];
+        //create north edge
+        byte north = edges[(byte)rand.nextInt(9)];
+        //if north has right corner
+        if(north % 2 == 1){
+            //check if it is connected, then east must have a left corner
+            if(((north >>> 1) & 1) != 0) byte east = left[(byte)rand.nextInt(5)];
+            //else, east must have a left corner and must be connected
+            else byte east = left_conn[(byte)rand.nextInt(5)];
+        }
+        //else it can be anything without left corner
+        else byte east = not_left[(byte)rand.nextInt(5)];
 
-        if(north > 12) byte east = left_set[(byte)rand.nextInt(4)];
-        else byte east = edges[(byte)rand.nextInt(10)];
+        if(east % 2 == 1){
+            if(((east >>> 1) & 1) != 0) byte south = left[(byte)rand.nextInt(5)];
+            else byte south = left_conn[(byte)rand.nextInt(5)];
+        }
+        else byte south = not_left[(byte)rand.nextInt(5)];
 
-        if(east > 12) byte south = left_set[(byte)rand.nextInt(4)];
-        else byte south = edges[(byte)rand.nextInt(10)];
-
-        if(south > 12 && north > 12) byte west = both_set[(byte)rand.nextInt(4)];
-        else byte west = edges[(byte)rand.nextInt(10)];
-
-        Piece A = new Piece(size, north, east, south, west);
+        if(south % 2 == 1){
+            if(((south >>> 1) & 1) != 0) byte west = left[(byte)rand.nextInt(5)];
+            else byte west = left_conn[(byte)rand.nextInt(5)];
+        }
+        else byte west = not_left[(byte)rand.nextInt(5)];
 
         /*if(north % 2 == 1) {
             if(((north >>> 1) & 1) != 0 || ((east >>> 3) & 1) != 0) {
