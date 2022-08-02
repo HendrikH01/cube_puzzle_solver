@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         App app = new App();
         app.run();
-        generatePiece();
+        //generatePiece();
     }
 
     public static String convertByteToBinary(byte n) {
