@@ -38,7 +38,7 @@ public class Main {
         // permutation
         if (size == 1){
 
-            pieces.add(new Piece(edges.get(0), edges.get(1), edges.get(2), edges.get(3)));
+            //pieces.add(new Piece(edges.get(0), edges.get(1), edges.get(2), edges.get(3)));
         }
 
         for (int i = 0; i < size; i++) {
