@@ -1,6 +1,7 @@
 package puzzle_cube_solver;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -8,115 +9,77 @@ public class Main {
 
     public static void main(String[] args) {
         App app = new App();
-        app.run();
-        //generatePiece();
+        //app.run();
+        generatePermutations((byte) 1, (byte) 7);
     }
+    public static void generatePermutations(byte start, byte end) {
+        List<Byte> edges = new ArrayList<>();
+        for (byte i = start; i < end; i++) {
+            edges.add(i);
+            //System.out.println(Integer.toBinaryString(i));
+        }
+        List<Piece> pers = new ArrayList<>();
+        heapPermutation(pers, edges, edges.size());
+        List<Piece> pieces = new ArrayList<>();
+        fillCorners(pers, pieces);
+        System.out.println(pers.size());
+        for (Piece piece : pers) {
+            System.out.print(Integer.toBinaryString(piece.north) + " ");
+            System.out.print(Integer.toBinaryString(piece.east) + " ");
+            System.out.print(Integer.toBinaryString(piece.south) + " ");
+            System.out.print(Integer.toBinaryString(piece.west) + " ");
+            System.out.println(" ");
+        }
 
-    public static String convertByteToBinary(byte n) {
-        if (n == 0) {
-            return "00000";
-        }
-        StringBuilder binaryNumber = new StringBuilder();
-        while (n > 0) {
-            int remainder = n % 2;
-            binaryNumber.append(remainder);
-            n /= 2;
-        }
-        while(binaryNumber.length() < 5)
-        {
-            binaryNumber.append("0");
-        }
-        return binaryNumber.reverse().toString();
     }
-    public static String convertByteToHashTag(byte n) {
-        if (n == 0) {
-            return "     ";
+    public static void heapPermutation(List<Piece> pers, List<Byte> edges, int size)
+    {
+        // if size becomes 1 then prints the obtained
+        // permutation
+        if (size == 1){
+            pers.add(new Piece(edges.get(0), edges.get(1), edges.get(2), edges.get(3)));
         }
-        StringBuilder binaryNumber = new StringBuilder();
-        while (n > 0) {
-            int remainder = n % 2;
-            if(remainder != 1) binaryNumber.append(" ");
-            else binaryNumber.append("#");
-            n /= 2;
-        }
-        while(binaryNumber.length() < 5)
-        {
-            binaryNumber.append(" ");
-        }
-        return binaryNumber.reverse().toString();
-    }
-    public static String reverseString(String str) {
-        char ch;
-        String nstr = "";
-        for (int i=0; i<str.length(); i++)
-        {
-            ch = str.charAt(i); //extracts each character
-            nstr = ch + nstr; //adds each character in front of the existing string
-        }
-        return nstr;
-    }
-    public static void generatePiece() {
-        //             only right               both            nothing         only left
-        byte[] edges = {0b00101,0b01011,0b00111,0b10101,0b11011,0b00100,0b01010,0b10100,0b11010,0b11100};
-        //             both            only left
-        byte[] left = {0b10101,0b11011,0b10100,0b11010,0b11100};
-        byte[] left_conn = {0b11011,0b11010,0b11100};
-        //                 only right              nothing
-        byte[] not_left = {0b00101,0b01011,0b00111,0b00100,0b01010,};
-        byte[] right_only = {0b00101,0b01011,0b00111};
-        byte[] left_only = {0b10100,0b11010,0b11100};
-        byte[] both = {0b10101,0b11011};
-        byte[] nothing = {0b00100,0b01010};
-        byte north, east, south, west;
-        Random rand = new Random();
-        //create north edge
-        north = edges[(byte)rand.nextInt(9)];
-        //if north has right corner
-        if(north % 2 == 1){
-            //check if it is connected, then east must have a left corner
-            if(((north >>> 1) & 1) != 0) east = left[(byte)rand.nextInt(5)];
-            //else, east must have a left corner and must be connected
-            else east = left_conn[(byte)rand.nextInt(5)];
-        }
-        //else it can be anything without left corner
-        else east = not_left[(byte)rand.nextInt(5)];
 
-        if(east % 2 == 1){
-            if(((east >>> 1) & 1) != 0) south = left[(byte)rand.nextInt(5)];
-            else south = left_conn[(byte)rand.nextInt(5)];
-        }
-        else south = not_left[(byte)rand.nextInt(5)];
+        for (int i = 0; i < size; i++) {
 
-        if(south % 2 == 1 && ((north >>> 4) & 1) != 0){
-            west = both[(byte)rand.nextInt(1)];
-        }
-        else if(south % 2 == 1 ){
-            west = left_only[(byte)rand.nextInt(2)];
-        }
-        else if(((north >>> 4) & 1) != 0){
-            west = right_only[(byte)rand.nextInt(2)];
-        }
-        else west = nothing[(byte)rand.nextInt(1)];
-
-        System.out.println(convertByteToBinary(north));
-        System.out.println(convertByteToBinary(east));
-        System.out.println(convertByteToBinary(south));
-        System.out.println(convertByteToBinary(west));
-        System.out.println();
-
-        System.out.println(convertByteToHashTag(north));
-        for(int row = 1; row < 4; row++)  {
-            for(int col = 0; col < 5; col++)  {
-                if(col == 0) {
-                    System.out.print(convertByteToHashTag(east).charAt(row));
-                    System.out.print("###");
-                }
-                if(col == 4) {
-                    System.out.print(reverseString(convertByteToHashTag(west)).charAt(row));
-                }
+            heapPermutation(pers, edges, size - 1);
+            // if size is odd, swap 0th i.e (first) and
+            // (size-1)th i.e (last) element
+            if (size % 2 == 1) {
+                byte temp = edges.get(0);
+                edges.set(0, edges.get(size - 1));
+                edges.set(size - 1, temp);
             }
-            System.out.println();
+
+            // If size is even, swap ith
+            // and (size-1)th i.e last element
+            else {
+                byte temp = edges.get(i);
+                edges.set(i, edges.get(size -1));
+                edges.set(size - 1, temp);
+            }
+
         }
-        System.out.println(reverseString(convertByteToHashTag(south)));
+
+    }
+    public static  void fillCorners(List<Piece> pers, List<Piece> pieces) {
+        for(Piece piece : pers) {
+            pieces.add(new Piece((byte) (piece.north << 1), (byte) (piece.east << 1), (byte) (piece.south << 1), (byte) (piece.west << 1)));
+        }
+        for(Piece piece : pieces) {
+            boolean uL, uR, bR, bL = false;
+            if(MathHelper.isBitOne(piece.west, 2) || MathHelper.isBitOne(piece.north, 4)) {
+                uL = true;
+            }
+            if(MathHelper.isBitOne(piece.north, 2) || MathHelper.isBitOne(piece.east, 4)) {
+                uR = true;
+            }
+            if(MathHelper.isBitOne(piece.east, 2) || MathHelper.isBitOne(piece.south, 4)) {
+                bR = true;
+            }
+            if(MathHelper.isBitOne(piece.south, 2) || MathHelper.isBitOne(piece.west, 4)) {
+                bL = true;
+            }
+        }
     }
 }

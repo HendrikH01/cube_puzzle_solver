@@ -1,5 +1,7 @@
 package puzzle_cube_solver;
 
+import java.util.List;
+
 public class MathHelper {
     public static boolean isBitOne(byte b, int bit) {
         return (b >> bit & 1) == 1;
