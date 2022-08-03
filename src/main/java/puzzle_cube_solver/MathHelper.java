@@ -11,7 +11,7 @@ public class MathHelper {
         while (b != 0) {
             r <<= 1;
             r |= (b & 1);
-            r >>= 1;
+            b >>= 1;
         }
 
         return r;

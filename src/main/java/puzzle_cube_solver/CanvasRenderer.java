@@ -1,6 +1,8 @@
 package puzzle_cube_solver;
 
 import static puzzle_cube_solver.MathHelper.isBitOne;
+import static puzzle_cube_solver.Main.PIECE_SIZE;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -8,10 +10,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
 
+import java.util.List;
+
 public class CanvasRenderer extends AnimationTimer {
-
-    final static int ps = 5;
-
     private final Canvas canvas;
     private final Piece[] testPieces = new Piece[] {
             new Piece((byte) 0b10100, (byte) 0b00100, (byte) 0b01010, (byte) 0b00011),
@@ -36,9 +37,19 @@ public class CanvasRenderer extends AnimationTimer {
         ctx.setFont(new Font("Verdana", 16));
         ctx.fillRect(0, 0, App.WIN_X, App.WIN_Y);
 
+        /*
         for(int i = 0; i < testPieces.length; i++) {
             for(int j = 0; j < 4; j++)
                 this.drawPiece(ctx, 30 + i * 80, 30 + j * 80, 10, testPieces[i], j);
+        } */
+
+        List<CubeSolver.Connection> list = CubeSolver.findConnections(testPieces[0], testPieces[5]);
+
+        int x = 0;
+        for(CubeSolver.Connection c : list) {
+            this.drawPiece(ctx, 30 + x * 80, 100, 10, c.p1(), c.r1());
+            this.drawPiece(ctx, 30 + x * 80, 60, 10, c.p2(), c.r2() + 2);
+            x += 1;
         }
 
         ctx.restore();
@@ -73,17 +84,17 @@ public class CanvasRenderer extends AnimationTimer {
             //TODO: clean this up
             if(i == 1) {
                 y = -size;
-                x = (ps - 1) * size;
+                x = (PIECE_SIZE - 1) * size;
             }
 
             if(i == 2) {
-                x = ps * size;
-                y = (ps - 2) * size;
+                x = PIECE_SIZE * size;
+                y = (PIECE_SIZE - 2) * size;
             }
 
             if(i == 3) {
                 x = size;
-                y = (ps - 1) * size;
+                y = (PIECE_SIZE - 1) * size;
             }
 
             ctx.save();
@@ -103,7 +114,7 @@ public class CanvasRenderer extends AnimationTimer {
         ctx.stroke();
         ctx.fill();
         //fill inner square
-        ctx.fillRect(size, 0, (ps - 2) * size, (ps - 2) * size);
+        ctx.fillRect(size, 0, (PIECE_SIZE - 2) * size, (PIECE_SIZE - 2) * size);
         ctx.restore();
     }
 
@@ -121,17 +132,17 @@ public class CanvasRenderer extends AnimationTimer {
             ctx.moveTo(size, 0);
         } else {
             ctx.moveTo(0, 0);
-            y = isBitOne(side, ps - 1) ? -size : 0;
+            y = isBitOne(side, PIECE_SIZE - 1) ? -size : 0;
             ctx.lineTo(x, y);
         }
 
         //loop over all squares that make up the side to be drawn
-        for (int i = 1; i < ps; i++) {
+        for (int i = 1; i < PIECE_SIZE; i++) {
             x += size;
 
             ctx.lineTo(x, y);
 
-            int y2 = isBitOne(side, ps - i - 1) ? -size : 0;
+            int y2 = isBitOne(side, PIECE_SIZE - i - 1) ? -size : 0;
             if (y2 != y) {
                 y = y2;
                 ctx.lineTo(x, y);

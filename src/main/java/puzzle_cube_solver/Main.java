@@ -3,6 +3,9 @@ package puzzle_cube_solver;
 import java.util.Random;
 
 public class Main {
+
+    public static final int PIECE_SIZE = 5;
+
     public static void main(String[] args) {
         App app = new App();
         app.run();
